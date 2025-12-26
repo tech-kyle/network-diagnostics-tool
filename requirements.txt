@@ -1,0 +1,5 @@
+Flask
+waitress
+requests
+dnspython
+python-dotenv

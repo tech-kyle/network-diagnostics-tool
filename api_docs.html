@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Documentation - Network Diagnostic Terminal</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #f5f7fa;
+  color: #2d3748;
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+}
+.container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+h1 { color: #3182ce; border-bottom: 3px solid #3182ce; padding-bottom: 15px; }
+h2 { color: #2c5282; margin-top: 30px; border-bottom: 2px solid #e8ecf1; padding-bottom: 10px; }
+h3 { color: #4a5568; margin-top: 25px; }
+code { background: #f7fafc; padding: 2px 6px; border-radius: 3px; font-family: 'SF Mono', Monaco, monospace; color: #e53e3e; }
+pre { background: #1e1e1e; color: #00ff00; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; }
+.endpoint { background: #e8ecf1; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #3182ce; }
+.method { display: inline-block; padding: 4px 12px; border-radius: 4px; font-weight: bold; margin-right: 10px; font-size: 0.85rem; }
+.method.get { background: #38a169; color: white; }
+.method.post { background: #dd6b20; color: white; }
+.back-link { display: inline-block; margin-bottom: 20px; color: #3182ce; text-decoration: none; font-weight: 600; }
+.back-link:hover { text-decoration: underline; }
+table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #e8ecf1; }
+table th { background: #f7fafc; font-weight: 600; color: #2d3748; }
+.note { background: #fff5e6; border-left: 4px solid #dd6b20; padding: 15px; margin: 15px 0; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+<a href="/" class="back-link">← Back to Main Interface</a>
+
+<h1>API Documentation</h1>
+<p>All diagnostic tools are available via REST API. The API supports both GET and POST requests and returns JSON responses.</p>
+
+<h2>Base URL</h2>
+<p><code>http://{{ canonical_host }}</code></p>
+
+<h2>Endpoints</h2>
+
+<h3>1. NSLookup</h3>
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <span class="method post">POST</span>
+  <code>/api/nslookup</code>
+</div>
+<p>Performs a DNS lookup for a hostname or IP address.</p>
+<h4>Parameters</h4>
+<table>
+  <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td>target</td><td>string</td><td>Yes</td><td>Hostname or IP address to look up</td></tr>
+  <tr><td>dns_server</td><td>string</td><td>No</td><td>DNS server to use (default: {{ dns_servers[0] }})</td></tr>
+</table>
+<h4>Example (cURL)</h4>
+<pre>curl "http://{{ canonical_host }}/api/nslookup?target=google.com&dns_server=8.8.8.8"</pre>
+<h4>Example (Python)</h4>
+<pre>import requests
+
+response = requests.get('http://{{ canonical_host }}/api/nslookup', params={
+    'target': 'google.com',
+    'dns_server': '8.8.8.8'
+})
+print(response.json())</pre>
+<h4>Example (PowerShell)</h4>
+<pre>$response = Invoke-RestMethod -Uri "http://{{ canonical_host }}/api/nslookup" `
+    -Method GET -Body @{
+        target = "google.com"
+        dns_server = "8.8.8.8"
+    }
+$response</pre>
+
+<h3>2. Ping</h3>
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <span class="method post">POST</span>
+  <code>/api/ping</code>
+</div>
+<p>Sends ICMP ping requests to test connectivity.</p>
+<h4>Parameters</h4>
+<table>
+  <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td>target</td><td>string</td><td>Yes</td><td>Hostname or IP address to ping</td></tr>
+  <tr><td>count</td><td>integer</td><td>No</td><td>Number of ping packets to send (default: 4)</td></tr>
+</table>
+<h4>Example (cURL)</h4>
+<pre>curl "http://{{ canonical_host }}/api/ping?target=google.com&count=4"</pre>
+<h4>Example (Bash)</h4>
+<pre>#!/bin/bash
+curl -s "http://{{ canonical_host }}/api/ping?target=google.com&count=4" | jq .</pre>
+
+<h3>3. Dig</h3>
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <span class="method post">POST</span>
+  <code>/api/dig</code>
+</div>
+<p>Queries specific DNS record types.</p>
+<h4>Parameters</h4>
+<table>
+  <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td>target</td><td>string</td><td>Yes</td><td>Hostname to query</td></tr>
+  <tr><td>type</td><td>string</td><td>No</td><td>Record type: A, MX, NS, TXT, CNAME, SOA, PTR, AAAA (default: A)</td></tr>
+  <tr><td>dns_server</td><td>string</td><td>No</td><td>DNS server to use</td></tr>
+</table>
+<h4>Example (cURL)</h4>
+<pre>curl "http://{{ canonical_host }}/api/dig?target=google.com&type=MX&dns_server=8.8.8.8"</pre>
+<h4>Example (Python)</h4>
+<pre>import requests
+
+response = requests.post('http://{{ canonical_host }}/api/dig', json={
+    'target': 'google.com',
+    'type': 'MX',
+    'dns_server': '8.8.8.8'
+})
+print(response.json()['result'])</pre>
+
+<h3>4. Traceroute</h3>
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <span class="method post">POST</span>
+  <code>/api/traceroute</code>
+</div>
+<p>Traces the network path to a destination.</p>
+<h4>Parameters</h4>
+<table>
+  <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td>target</td><td>string</td><td>Yes</td><td>Hostname or IP address to trace</td></tr>
+</table>
+<h4>Example (cURL)</h4>
+<pre>curl "http://{{ canonical_host }}/api/traceroute?target=google.com"</pre>
+<h4>Example (PowerShell)</h4>
+<pre>Invoke-RestMethod -Uri "http://{{ canonical_host }}/api/traceroute?target=google.com" -Method GET | 
+    Select-Object -ExpandProperty result</pre>
+
+<h3>5. Network Connection Test</h3>
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <span class="method post">POST</span>
+  <code>/api/netconnection</code>
+</div>
+<p>Tests if a specific port is open on a target.</p>
+<h4>Parameters</h4>
+<table>
+  <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td>target</td><td>string</td><td>Yes</td><td>Hostname or IP address</td></tr>
+  <tr><td>port</td><td>integer</td><td>No</td><td>Port number (default: 443)</td></tr>
+  <tr><td>protocol</td><td>string</td><td>No</td><td>tcp or udp (default: tcp)</td></tr>
+</table>
+<h4>Example (cURL)</h4>
+<pre>curl "http://{{ canonical_host }}/api/netconnection?target=google.com&port=443&protocol=tcp"</pre>
+<h4>Example (Python)</h4>
+<pre>import requests
+
+response = requests.post('http://{{ canonical_host }}/api/netconnection', json={
+    'target': 'google.com',
+    'port': 443,
+    'protocol': 'tcp'
+})
+print(response.json()['result'])</pre>
+
+<h2>Response Format</h2>
+<p>All API endpoints return JSON responses with the following structure:</p>
+<pre>{
+  "success": true,
+  "target": "google.com",
+  "dns_server": "8.8.8.8",
+  "result": "Name: google.com\nAddress: 142.250.185.46",
+  "timestamp": "2024-12-26T10:30:00Z"
+}</pre>
+
+<h2>Error Handling</h2>
+<p>Error responses return HTTP 400 with a JSON error message:</p>
+<pre>{
+  "error": "Target parameter required"
+}</pre>
+
+<div class="note">
+<strong>Note:</strong> The traceroute originates from the application server, so the path shown may differ from your local machine's path.
+</div>
+
+<h2>Rate Limiting</h2>
+<p>Currently, there are no rate limits enforced. For production use, consider implementing rate limiting based on your needs.</p>
+
+<h2>DNS Servers Available</h2>
+<table>
+  <tr><th>DNS Server</th><th>Provider</th></tr>
+  {% for dns in dns_servers %}
+  <tr><td><code>{{ dns }}</code></td><td>Custom DNS Server {{ loop.index }}</td></tr>
+  {% endfor %}
+  <tr><td><code>8.8.8.8</code></td><td>Google DNS Primary</td></tr>
+  <tr><td><code>1.1.1.1</code></td><td>Cloudflare DNS Primary</td></tr>
+</table>
+
+<h2>Status Endpoint</h2>
+<div class="endpoint">
+  <span class="method get">GET</span>
+  <code>/api/dns-status</code>
+</div>
+<p>Checks the status of the configured DNS server ({{ status_check_host }}).</p>
+<h4>Example Response</h4>
+<pre>{
+  "online": true,
+  "message": "✅ {{ status_check_host }} is ONLINE",
+  "last_checked": 1703593800
+}</pre>
+
+</div>
+</body>
+</html>
