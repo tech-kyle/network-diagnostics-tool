@@ -1,9 +1,5 @@
 # Network Diagnostics Tool - Project Summary
 
-## 🎉 Sanitization Complete!
-
-Your code has been successfully converted from a Mayo Clinic internal tool to a generic, open-source Network Diagnostics Tool ready for GitHub.
-
 ## 📦 What You Have
 
 A complete, production-ready web application with:
@@ -376,6 +372,6 @@ Your code is now:
 ---
 
 **Project**: Network Diagnostics Tool v1.0.0
-**GitHub**: @techbutton/network-diagnostics-tool
+**GitHub**: @tech-kyle/network-diagnostics-tool
 **License**: MIT
 **Created**: December 26, 2024
